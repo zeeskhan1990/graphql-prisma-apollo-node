@@ -1,0 +1,7 @@
+#run docker-machine ip default to find the ip
+
+#Automatically setting the service name to default & stage name to default
+# i.e, this is http://192.168.99.100:4466/default/default
+# think of the service name as the project name
+endpoint: http://192.168.99.100:4466
+datamodel: datamodel.graphql
