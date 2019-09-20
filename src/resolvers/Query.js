@@ -1,26 +1,35 @@
 const Query = {
     users(parent, args, ctx, info) {
-        if(!args.query) {
-            return ctx.db.blogUsers
+        //info contains the request detail. The query projection/selection set can be found out from here directly
+        //2nd arg - nothing, string, object. Default is nothing which causes to select only all scalar fields
+        const opArgs = {}
+        if(args.query) {
+            opArgs.where = {
+                OR: [{
+                    name_contains: args.query
+                }, {
+                    email_contains: args.query
+                }]
+            }
         }
-
-        return ctx.db.blogUsers.filter((user) => {
-            return user.name.toLowerCase().includes(args.query.toLowerCase())
-        })
+        return ctx.prisma.query.users(opArgs, info)
     },
-    posts(parent, args, {db}, info) {
-        if (!args.query) {
-            return db.posts
+    posts(parent, args, {prisma}, info) {
+        const opArgs = {}
+
+        if (args.query) {
+            opArgs.where = {
+                OR: [{
+                    title_contains: args.query
+                }, {
+                    body_contains: args.query
+                }]
+            }
         }
-
-        return db.posts.filter((post) => {
-            const isTitleMatch = post.title.toLowerCase().includes(args.query.toLowerCase())
-            const isBodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
-            return isTitleMatch || isBodyMatch
-        })
+        return prisma.query.posts(opArgs, info)
     },
-    comments(parent, args, {db}, info) {
-        return db.comments 
+    comments(parent, args, {prisma}, info) {
+        return prisma.query.comments(null, info)
     },
     me() {
         return {

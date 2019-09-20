@@ -17,8 +17,7 @@
     "babel-preset-env": "^1.7.0",
     "graphql-cli": "^2.16.4",
     "graphql-yoga": "^1.16.7",
-    "prisma-binding": "^2.1.1",
-    "uuid": "^3.3.2"
+    "prisma-binding": "^2.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.0",
@@ -26,6 +25,8 @@
     "@babel/node": "^7.6.1",
     "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
     "@babel/preset-env": "^7.6.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.3.0",
     "nodemon": "^1.19.2"
   }
 }
