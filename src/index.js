@@ -1,3 +1,4 @@
+import "@babel/polyfill"
 import {GraphQLServer, PubSub} from "graphql-yoga"
 
 import db from "./db"
@@ -32,7 +33,7 @@ const server = new GraphQLServer({
     },
     fragmentReplacements
 })
-
-server.start({port:4500}, () => {
+//process.env.PORT is defined by Heroku in prod
+server.start({port:process.env.PORT || 4600}, () => {
     console.log('The server is running')
 })
