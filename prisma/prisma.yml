@@ -5,4 +5,4 @@
 # think of the service name as the project name
 endpoint: ${env:PRISMA_ENDPOINT}
 datamodel: datamodel.graphql
-secret: zeeshankhan
+secret: ${env:PRISMA_SECRET}
