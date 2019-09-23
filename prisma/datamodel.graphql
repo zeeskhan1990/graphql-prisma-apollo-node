@@ -1,28 +1,39 @@
+# Both @id and @unique is being used because the local docker container which is of a previous version 
+# needs the unique directive but the new prod version wants the @id directive
+# In the updated Prisma datamodel, relations are represented by either foreign key or tables depending on params
+# passed to @relation, (link: INLINE) or (link: TABLE). Default is inline, i.e., foreign keys
 type User {
-  id: ID! @unique
+  id: ID! @id @unique
   name: String!  
   email: String! @unique
   password: String!
   posts:[Post!]! @relation(name:"PostToUser", onDelete: CASCADE)
   comments: [Comment!]! @relation(name:"CommentToUser", onDelete: CASCADE)
+  updatedAt: DateTime! @updatedAt
+  createdAt: DateTime! @createdAt
 }
-#So, SET_NULL basically would in practice work when there is a one to many relation to the related type
+
+# SET_NULL would in practice work when there is a one to many relation to the related type
 # Because once you are applying SET_NULL, if the related type a list of this current type then it basically
 # gets deleted from  that list, but the list is still staying valid and isn't violating not-null constraint if it has any
-# if it was an one-to-one relation then it would not be possibe because in that case the deleting of current type would
-# by default remove the related field in the relaated type thus violating constraint
+# whereas if it was an one-to-one relation then it would not be possibe because in that case the deleting of
+# current type would by default remove the related field in the relaated type thus violating constraint
 type Post {
-  id: ID! @unique
+  id: ID! @id @unique
   title: String!
   body: String!
   published: Boolean!
   author: User! @relation(name:"PostToUser", onDelete: SET_NULL)
   comments: [Comment!]! @relation(name:"CommentToPost", onDelete: CASCADE)
+  updatedAt: DateTime! @updatedAt
+  createdAt: DateTime! @createdAt
 }
 
 type Comment {
-    id: ID! @unique
+    id: ID! @id @unique
     text: String!
     author: User! @relation(name:"CommentToUser", onDelete: SET_NULL)
     post: Post! @relation(name:"CommentToPost", onDelete: SET_NULL)
+    updatedAt: DateTime! @updatedAt
+    createdAt: DateTime! @createdAt
 }
