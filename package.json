@@ -8,7 +8,8 @@
     "heroku-postbuild": "babel src --out-dir dist --copy-files",
     "dev": "env-cmd ./config/dev.env nodemon src/index.js --ext js,graphql --exec babel-node",
     "debug": "nodemon src/index.js --ext js,graphql --exec babel-node inspect",
-    "test": "env-cmd ./config/test.env jest --watch",
+    "test": "env-cmd ./config/test.env jest --watch --runInBand",
+    "test-subscribe": "env-cmd ./config/test.env jest ./tests/comment.test.js --watch --runInBand",
     "get-schema": "graphql get-schema -p graphql-prisma-apollo-node --dotenv ./config/dev.env"
   },
   "jest": {
@@ -21,12 +22,20 @@
     "@babel/cli": "^7.6.0",
     "@babel/core": "^7.6.0",
     "@babel/polyfill": "^7.6.0",
+    "apollo-cache-inmemory": "^1.2.10",
+    "apollo-client": "^2.4.2",
+    "apollo-link": "^1.2.3",
+    "apollo-link-error": "^1.1.1",
+    "apollo-link-http": "^1.5.5",
+    "apollo-link-ws": "^1.0.9",
+    "apollo-utilities": "^1.0.21",
+    "bcryptjs": "^2.4.3",
     "env-cmd": "^8.0.2",
     "graphql-cli": "^2.16.4",
     "graphql-yoga": "^1.16.7",
+    "jsonwebtoken": "^8.3.0",
     "prisma-binding": "^2.1.1",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^8.3.0"
+    "subscriptions-transport-ws": "^0.9.15"
   },
   "devDependencies": {
     "@babel/node": "^7.6.1",

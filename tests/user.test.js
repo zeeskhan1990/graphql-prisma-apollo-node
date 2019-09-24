@@ -1,94 +1,76 @@
-import getFirstName from '../src/utils/user'
 import 'cross-fetch/polyfill'
-import ApolloBoost, {gql} from "apollo-boost"
+import {gql} from "apollo-boost"
 import prisma from "../src/prisma"
-import bcrypt from "bcryptjs"
+import seedDatabase, { userOne }  from "./utils/seedDatabase"
+import getClient from "./utils/getClient"
+import { createUser, getUsers, login, getProfile } from './utils/operations'
+ 
 
 //Same port as declared in globalSetup
-const client = new ApolloBoost({
-    uri:'http://localhost:4800'
-})
+const client = getClient()
 
-beforeEach(async () => {
-    await prisma.mutation.deleteManyPosts()
-    await prisma.mutation.deleteManyUsers()
-    const user = await prisma.mutation.createUser({
-        data: {
-            name: 'TestUser',
-            email: 'test@testuser.com',
-            password: bcrypt.hashSync('12345678')
-        }
-    })
-    console.log("CREATED USER", JSON.stringify(user, undefined, 4))    
-    await prisma.mutation.createPost({
-        data: {
-            title: 'My published post',
-            body: '',
-            published: true,
-            author: {
-                connect: {
-                    id: user.id
-                }
-            }
-        }
-    })
-    await prisma.mutation.createPost({
-        data: {
-            title: 'My NOT published post',
-            body: '',
-            published: false,
-            author: {
-                connect: {
-                    id: user.id
-                }
-            }
-        }
-    })
-})
+//There should be an in-memory test database because this is damn slow
+jest.setTimeout(60000)
 
-test('should create a new user', async () => {
-    const createUser = gql`
-        mutation {
-            createUser(data: {
-                name: "Roo",
-                email: "roo@roo.com",
-                password: "12345678"
-            }) {
-                token
-                user {
-                    id
-                }
-            }
-        }
-    `
+beforeEach(seedDatabase)
 
+test('Should create a new user', async () => {
+    const variables = {
+        data: {
+            name: 'Roo',
+            email: 'roo@example.com',
+            password: 'MyPass123'
+        }
+    }
     const response = await client.mutate({
-        mutation: createUser 
+        mutation: createUser,
+        variables
     })
 
-    const exists = await prisma.exists.User({id: response.data.createUser.user.id})
+    const exists = await prisma.exists.User({ id: response.data.createUser.user.id })
     expect(exists).toBe(true)
 })
 
-test('Should return all users', async () => {
-    const getUsers = gql`
-        query {
-            users {
-                id
-                name
-                email
-            }
-        }
-    `
+test('Should expose public author profiles', async () => {
     const response = await client.query({ query: getUsers })
 
-    expect(response.data.users.length).toBe(1)
+    expect(response.data.users.length).toBe(2)
     expect(response.data.users[0].email).toBe(null)
-    expect(response.data.users[0].name).toBe('TestUser')
+    expect(response.data.users[0].name).toBe('Jen')
 })
 
+test('Should not login with bad credentials', async () => {
+    const variables = {
+        data: {
+            email: "jen@example.com",
+            password: "red098!@#$"
+        }
+    }
 
-test('should get first name', () => {
-    const firstName = getFirstName('Zeeshan Khan')
-    expect(firstName).toBe('Zeeshan')    
+    await expect(
+        client.mutate({ mutation: login, variables })
+    ).rejects.toThrow()
+})
+
+test('Should not signup user with invalid password', async () => {
+    const variables = {
+        data: {
+            name: 'Roo',
+            email: 'roo@example.com',
+            password: 'pass'
+        }
+    }
+
+    await expect(
+        client.mutate({ mutation: createUser, variables })
+    ).rejects.toThrow()
+})
+
+test('Should fetch user profile', async () => {
+    const client = getClient(userOne.jwt)
+    const { data } = await client.query({ query: getProfile })
+
+    expect(data.me.id).toBe(userOne.user.id)
+    expect(data.me.name).toBe(userOne.user.name)
+    expect(data.me.email).toBe(userOne.user.email)
 })
