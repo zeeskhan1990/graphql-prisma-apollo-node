@@ -16,9 +16,11 @@
 			"request": "launch",
 			"protocol": "inspector",
 			"name": "ES6 Debugger",
-			"program": "${workspaceFolder}/src/index.js",
-			"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/nodemon",
+			"program": "${workspaceFolder}/config/dev.env",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/env-cmd",
 			"runtimeArgs": [
+                "${workspaceRoot}/node_modules/.bin/nodemon",
+                "${workspaceFolder}/src/index.js",
                 "--nolazy",
                 "--ext",
                 "js,graphql",

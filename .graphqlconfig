@@ -1,6 +1,6 @@
 {
     "projects": {
-        "graphql-prisma-apollo-node-2": {
+        "graphql-prisma-apollo-node": {
             "schemaPath": "src/generated/prisma.graphql",
             "extensions": {
                 "prisma": "prisma/prisma.yml",
